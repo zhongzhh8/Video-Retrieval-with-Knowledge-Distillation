@@ -63,7 +63,7 @@ def Pure(opt,train_loader,test_loader,db_loader,checkpoint_path):
         print('loaded model from ' + opt.load_model_path)
     optimizer = torch.optim.SGD(net.parameters(), lr=opt.lr, momentum=0.9, weight_decay=0.0005)
     # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, opt.step_lr,gamma=0.1)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.1, patience=5, verbose=True)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.1, patience=opt.lr_patience, verbose=True)
     print('===finish setting network and optimizer===')
 
     print('===start pure training===')
@@ -136,7 +136,7 @@ def KD(opt, train_loader, test_loader, db_loader, checkpoint_path):
         print('loaded model from ' + opt.load_model_path)
     optimizer = torch.optim.SGD(net.parameters(), lr=opt.lr, momentum=0.9, weight_decay=0.0005)
     # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, opt.step_lr,gamma=0.1)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.1, patience=5, verbose=True)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.1, patience=opt.lr_patience, verbose=True)
     print('===finish setting network and optimizer===')
 
     print('===start pure training===')
@@ -238,34 +238,34 @@ def prepare_data(opt,the_num_frames):
 def get_parser():
     parser = argparse.ArgumentParser(description='train C3DHash')
 
-    parser.add_argument('--dataset_name', default='UCF', help='HMDB or UCF or JHMDB')
+    parser.add_argument('--dataset_name', default='JHMDB', help='HMDB or UCF or JHMDB')
     parser.add_argument('--mode', type=str, default='KD', help='pure or KD')
-    parser.add_argument('--num_frames', type=int, default=16, help='number of frames taken form a video')
+    parser.add_argument('--num_frames', type=int, default=10, help='number of frames taken form a video')
     parser.add_argument('--hash_length', type=int, default=48, help='length of hashing binary')
     parser.add_argument('--margin', type=float, default=14, help='取bit的四分之一多一点，margin影响很大')
 
-    parser.add_argument('--L3weight', type=float, default=0.8, help='取bit的四分之一多一点，margin影响很大')
-    parser.add_argument('--Lrepweight', type=float, default=1, help='取bit的四分之一多一点，margin影响很大')
-
-    parser.add_argument('--postfix', type=str, default='0.8+1', help='postfix of checkpoint file')
+    parser.add_argument('--L3weight', type=float, default=1, help='取bit的四分之一多一点，margin影响很大')
+    parser.add_argument('--Lrepweight', type=float, default=0.001, help='取bit的四分之一多一点，margin影响很大')
+    parser.add_argument('--postfix', type=str, default='1+0.001', help='postfix of checkpoint file')
 
     parser.add_argument('--cudaid', type=str, default='0', help='')
-    parser.add_argument('--deviceid', type=list, default=[0,2], help='')
+    parser.add_argument('--deviceid', type=list, default=[0,2,3], help='')
 
-    parser.add_argument('--lr', type=float, default=0.0001, help='UCF建议用 0.0001， JHMDB用 0.001')
+    parser.add_argument('--lr', type=float, default=0.0001, help='UCF建议用 0.0001， JHMDB用 0.0001')
     parser.add_argument('--batch_size', type=int, default=120, help='input batch size')
     parser.add_argument('--num_epochs', type=int, default=300, help='number of epochs to train for')
     parser.add_argument('--step_lr', type=int, default=40, help='change lr per strp_lr epoch')
     parser.add_argument('--checkpoint_step', type=int, default=5, help='checkpointing after batches')
+    parser.add_argument('--lr_patience', type=int, default=5, help='')
 
     parser.add_argument('--load_model', default=False, help='wether load model checkpoints or not')
     parser.add_argument('--load_model_path',
          default='/home/disk1/azzh/PycharmProject/video_retrieval_KD/checkpoints/UCF_48bits_14margin_16frames_KD_1Lrep/net_mAP0.768158.pth',help='location to load model')
 
 
-    parser.add_argument('--teacher_num_frames', type=int, default=32, help='')
+    parser.add_argument('--teacher_num_frames', type=int, default=20, help='')
     parser.add_argument('--teacher_model_path',
-                        default='/home/disk1/azzh/PycharmProject/video_retrieval_KD/checkpoints/UCF_48bits_14margin_32frames_pure_/net_mAP0.801399.pth',
+                        default='/home/disk1/azzh/PycharmProject/video_retrieval_KD/checkpoints/net_mAP0.576061.pth',
                         help='')
 
     return parser

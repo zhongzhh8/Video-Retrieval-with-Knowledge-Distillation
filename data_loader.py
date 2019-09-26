@@ -47,8 +47,6 @@ class CustomDataset(data.Dataset):
 
         assert len(l) == self.num_frames
 
-        # frames_length=16
-        # l=l[0:32:2]
 
         frames_array = np.zeros((frames_length, 3, 112, 112), dtype=np.float32)
 
